@@ -1,1 +1,1 @@
-# elastalert-datadog-alerter
+Datadog alerter for ElastAlert
