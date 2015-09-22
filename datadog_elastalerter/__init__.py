@@ -6,7 +6,7 @@ class DatadogAlerter(Alerter):
     required_options = set(['datadog_api_key'])
     required_options = set(['datadog_app_key'])
 
-     def __init__(self, *args):
+    def __init__(self, *args):
         super(DatadogAlerter, self).__init__(*args)
 
         self.api_key = self.rule.get('datadog_api_key')
