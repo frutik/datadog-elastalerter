@@ -1,23 +1,30 @@
 from elastalert.alerts import Alerter, basic_match_string
+from datadog import api, initialize
+
 
 class DatadogAlerter(Alerter):
     required_options = set(['datadog_api_key'])
+    required_options = set(['datadog_app_key'])
+
+     def __init__(self, *args):
+        super(DatadogAlerter, self).__init__(*args)
+
+        self.api_key = self.rule.get('datadog_api_key')
+        self.app_key = self.rule.get('datadog_app_key')
+
+        options = {
+            'api_key': self.api_key,
+            'app_key': self.app_key
+        }
+        initialize(**options)
 
     def alert(self, matches):
         for match in matches:
+            text = basic_match_string(self.rule, match)
+            title = "Something big happened!"
+            tags = ['version:1', 'application:web']
 
-            # Config options can be accessed with self.rule
-            with open(self.rule['output_file_path'], "a") as output_file:
+            api.Event.create(title=title, text=text, tags=tags)
 
-                # basic_match_string will transform the match into the default
-                # human readable string format
-                match_string = basic_match_string(self.rule, match)
-
-                output_file.write(match_string)
-
-    # get_info is called after an alert is sent to get data that is written back
-    # to Elasticsearch in the field "alert_info"
-    # It should return a dict of information relevant to what the alert does
     def get_info(self):
-        return {'type': 'Datadog Alerter',
-                'output_file': self.rule['output_file_path']}
+        return {'type': 'Datadog Alerter'}
